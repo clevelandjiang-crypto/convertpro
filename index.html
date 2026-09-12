@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ConvertPro — 专业在线视频工具箱</title>
+<meta name="description" content="ConvertPro 在线视频转换、压缩、裁剪、合并、MP3、GIF，一站式视频处理平台。">
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#070b18;color:#eef2ff}
+body:before{content:"";position:fixed;inset:0;z-index:-2;background:radial-gradient(circle at 15% 10%,#5b5cf622,transparent 32%),radial-gradient(circle at 85% 20%,#00d4ff16,transparent 28%),#070b18}
+body:after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background-image:linear-gradient(#ffffff06 1px,transparent 1px),linear-gradient(90deg,#ffffff06 1px,transparent 1px);background-size:48px 48px;mask-image:linear-gradient(to bottom,#000,transparent 70%)}
+nav{height:72px;border-bottom:1px solid #ffffff12;background:#070b18cc;backdrop-filter:blur(18px);display:flex;align-items:center;justify-content:space-between;padding:0 max(20px,calc((100% - 1180px)/2));position:sticky;top:0;z-index:5}
+.logo{font-size:22px;font-weight:900;letter-spacing:-.5px}.logo i{font-style:normal;color:#8b7cff}.navlinks{display:flex;gap:25px}.navlinks a{color:#aeb7cf;text-decoration:none;font-size:14px}.navbtn{border:1px solid #ffffff18;border-radius:10px;padding:10px 14px;color:#fff!important;background:#ffffff0b}
+.wrap{max-width:1180px;margin:auto;padding:70px 20px}.hero{text-align:center}.badge{display:inline-flex;gap:8px;align-items:center;border:1px solid #8b7cff44;background:#8b7cff12;color:#bdb7ff;border-radius:99px;padding:7px 12px;font-size:12px;font-weight:700}.hero h1{font-size:clamp(40px,7vw,74px);line-height:1.02;letter-spacing:-3px;margin:20px 0 16px}.gradient{background:linear-gradient(90deg,#fff,#9b8cff,#4de3ff);-webkit-background-clip:text;color:transparent}.hero p{max-width:700px;margin:0 auto;color:#9aa6bf;font-size:17px;line-height:1.7}
+.tabs{display:flex;gap:9px;overflow:auto;padding:6px;margin:40px auto 20px;max-width:950px}.tab{flex:0 0 auto;background:#ffffff08;color:#9da8c0;border:1px solid #ffffff12;padding:12px 17px;border-radius:12px;font-weight:700;cursor:pointer}.tab.active{background:#8b7cff;color:white;border-color:#8b7cff}
+.panel{max-width:950px;margin:auto;background:linear-gradient(145deg,#11172aee,#0d1222ee);border:1px solid #ffffff14;border-radius:25px;padding:28px;box-shadow:0 30px 90px #0008}
+.drop{min-height:250px;border:1.5px dashed #59647e;border-radius:20px;background:#ffffff04;display:flex;align-items:center;justify-content:center;text-align:center;cursor:pointer;transition:.2s}.drop:hover,.drop.drag{border-color:#8b7cff;background:#8b7cff0c}.upload-icon{width:64px;height:64px;margin:0 auto 16px;border-radius:18px;background:#8b7cff18;display:grid;place-items:center;font-size:27px}.drop h3{margin:0 0 7px;font-size:20px}.drop p{margin:0;color:#7f8ba5;font-size:13px}input[type=file]{display:none}
+.files{display:none;margin-top:14px;gap:8px;flex-wrap:wrap}.files.show{display:flex}.chip{background:#ffffff08;border:1px solid #ffffff12;border-radius:10px;padding:9px 11px;color:#cbd3e6;font-size:12px}
+.settings{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-top:18px}.field label{display:block;color:#9aa6bf;font-size:12px;font-weight:700;margin-bottom:7px}select,input[type=number]{width:100%;height:44px;background:#080d1a;border:1px solid #ffffff18;color:#e7ebf5;border-radius:10px;padding:0 11px}
+.actions{display:flex;gap:10px;margin-top:18px}button{border:0;border-radius:11px;height:46px;padding:0 20px;font-weight:800;cursor:pointer;background:#8b7cff;color:white;flex:1}.secondary{background:#ffffff0b;border:1px solid #ffffff15;color:#cdd5e7}
+.status{display:none;margin-top:20px}.status.show{display:block}.statusline{display:flex;justify-content:space-between;color:#9aa6bf;font-size:12px;margin-bottom:7px}.bar{height:8px;border-radius:99px;background:#ffffff0d;overflow:hidden}.bar i{display:block;width:0;height:100%;background:linear-gradient(90deg,#8b7cff,#42d9ff);transition:.2s}
+.result{display:none;margin-top:17px;padding:17px;border:1px solid #31d49b44;background:#31d49b0c;border-radius:13px}.result.show{display:block}.result a{display:inline-block;margin-top:10px;padding:10px 15px;border-radius:9px;background:#25c98e;color:#06150f;text-decoration:none;font-weight:900}
+.pricing{padding:85px 0}.section-title{text-align:center}.section-title h2{font-size:35px;margin:0 0 9px}.section-title p{color:#8995ad}.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin-top:28px}.plan{background:#ffffff06;border:1px solid #ffffff12;border-radius:20px;padding:25px}.plan.hot{border-color:#8b7cff88;box-shadow:0 15px 55px #8b7cff15}.plan h3{margin:0}.price{font-size:36px;font-weight:900;margin:15px 0}.price small{font-size:12px;color:#8995ad}.plan ul{list-style:none;padding:0;color:#aab4ca;font-size:13px;line-height:2.1}.plan li:before{content:"✓";color:#67e8c1;margin-right:8px}.plan button{margin-top:8px}
+.features{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:25px}.feature{padding:21px;background:#ffffff05;border:1px solid #ffffff10;border-radius:17px}.feature b{display:block;margin-bottom:7px}.feature span{color:#8995ad;font-size:13px;line-height:1.6}
+footer{border-top:1px solid #ffffff0e;color:#66728a;text-align:center;padding:35px 20px;font-size:12px}
+@media(max-width:800px){.settings,.plans,.features{grid-template-columns:1fr}.navlinks{display:none}.wrap{padding-top:45px}.panel{padding:17px}.hero h1{letter-spacing:-1.5px}}
+</style>
+</head>
+<body>
+<nav><div class="logo">Convert<i>Pro</i></div><div class="navlinks"><a href="#tools">工具</a><a href="#pricing">会员</a><a href="#features">特点</a><a class="navbtn" href="#login">登录</a></div></nav>
+<main class="wrap">
+<section class="hero"><span class="badge">✦ 新一代在线视频工具</span><h1>让视频处理<br><span class="gradient">简单得像上传文件</span></h1><p>转换、压缩、裁剪、合并、提取 MP3、制作 GIF。一个网站完成全部工作。</p></section>
+<section id="tools">
+<div class="tabs">
+<button class="tab active" data-tool="convert">🔄 格式转换</button><button class="tab" data-tool="audio">🎵 MP3</button><button class="tab" data-tool="compress">📦 压缩</button><button class="tab" data-tool="trim">✂️ 裁剪</button><button class="tab" data-tool="merge">🔗 合并</button><button class="tab" data-tool="gif">🎞️ GIF</button>
+</div>
+<div class="panel">
+<label class="drop" id="drop"><div><div class="upload-icon">↑</div><h3>拖拽视频到这里</h3><p>或点击选择文件 · 支持 MP4、MOV、WebM、MKV 等</p><input id="files" type="file" accept="video/*" multiple></div></label>
+<div class="files" id="filesbox"></div>
+<div class="settings"><div class="field"><label>输出格式</label><select id="format"><option>MP4</option><option>WebM</option><option>MOV</option><option>MKV</option></select></div><div class="field"><label>质量</label><select id="quality"><option>原画</option><option>1080p</option><option>720p</option><option>480p</option></select></div><div class="field"><label>起始秒数（裁剪/GIF）</label><input id="start" type="number" min="0" step=".1" value="0"></div></div>
+<div class="actions"><button id="run">开始处理</button><button class="secondary" id="clear">清空</button></div>
+<div class="status" id="status"><div class="statusline"><span id="st">准备中…</span><span id="pct">0%</span></div><div class="bar"><i id="bar"></i></div></div>
+<div class="result" id="result"><b>✓ 处理完成</b><div id="rtext"></div><a id="download">下载文件</a></div>
+</div></section>
+<section class="pricing" id="pricing"><div class="section-title"><h2>选择适合你的方案</h2><p>先免费使用，再按需求升级。</p></div><div class="plans">
+<div class="plan"><h3>免费版</h3><div class="price">¥0 <small>/ 月</small></div><ul><li>每天 5 次处理</li><li>单文件 500 MB</li><li>基础格式转换</li><li>浏览器本地处理</li></ul><button class="secondary">当前方案</button></div>
+<div class="plan hot"><h3>Pro</h3><div class="price">¥29 <small>/ 月</small></div><ul><li>每天 100 次处理</li><li>单文件 5 GB</li><li>全部视频工具</li><li>优先云端队列</li><li>无广告</li></ul><button>升级 Pro</button></div>
+<div class="plan"><h3>团队版</h3><div class="price">¥99 <small>/ 月</small></div><ul><li>无限团队成员</li><li>单文件 20 GB</li><li>高速云端转码</li><li>API 与批量处理</li><li>团队管理后台</li></ul><button class="secondary">联系销售</button></div>
+</div></section>
+<section id="features"><div class="section-title"><h2>为上线运营而设计</h2><p>商业化需要的页面和产品结构已经预留。</p></div><div class="features"><div class="feature"><b>🔐 账号体系</b><span>登录、注册、个人中心和会员状态入口。</span></div><div class="feature"><b>☁️ 云端转码</b><span>架构预留云端 FFmpeg、任务队列和大文件处理。</span></div><div class="feature"><b>💳 支付订阅</b><span>会员套餐页面已就绪，可接 Stripe/支付宝/微信支付。</span></div><div class="feature"><b>📈 管理后台</b><span>可继续接入用户、订单、任务和用量统计。</span></div></div></section>
+</main><footer>© 2026 ConvertPro · 隐私 · 服务条款 · 联系我们</footer>
+<script type="module">
+import{FFmpeg}from"https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.15/dist/esm/index.js";import{fetchFile,toBlobURL}from"https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.2/dist/esm/index.js";
+const $=x=>document.getElementById(x),ff=new FFmpeg();let loaded=false,files=[],tool="convert";
+async function load(){if(loaded)return;$("st").textContent="正在加载转换引擎…";let b="https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/esm";await ff.load({coreURL:await toBlobURL(b+"/ffmpeg-core.js","text/javascript"),wasmURL:await toBlobURL(b+"/ffmpeg-core.wasm","application/wasm")});loaded=true}
+ff.on("progress",e=>prog(e.progress*100,"正在处理…"));function prog(p,t){p=Math.round(p);$("pct").textContent=p+"%";$("bar").style.width=p+"%";$("st").textContent=t}
+document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));b.classList.add("active");tool=b.dataset.tool});
+function pick(x){files=[...x];$("filesbox").innerHTML=files.map(f=>`<span class="chip">${f.name}</span>`).join("");$("filesbox").classList.toggle("show",files.length>0)}
+$("files").onchange=e=>pick(e.target.files);$("drop").ondragover=e=>{e.preventDefault();$("drop").classList.add("drag")};$("drop").ondragleave=()=>$("drop").classList.remove("drag");$("drop").ondrop=e=>{e.preventDefault();$("drop").classList.remove("drag");pick(e.dataTransfer.files)};$("clear").onclick=()=>location.reload();
+$("run").onclick=async()=>{if(!files.length)return alert("请先选择视频。");$("run").disabled=true;$("status").classList.add("show");$("result").classList.remove("show");try{await load();let f=files[0],ext=f.name.split(".").pop().toLowerCase(),input="input."+ext;await ff.writeFile(input,await fetchFile(f));let a=["-i",input],out;
+if(tool==="audio"){out="audio.mp3";a.push("-vn","-c:a","libmp3lame","-q:a","2")}
+else if(tool==="gif"){out="output.gif";a.push("-ss",$("start").value,"-t","10","-vf","fps=10,scale=480:-1","-loop","0")}
+else if(tool==="trim"){out="trimmed.mp4";a.push("-ss",$("start").value,"-t","10","-c:v","libx264","-c:a","aac")}
+else if(tool==="compress"){out="compressed.mp4";a.push("-c:v","libx264","-crf","30","-preset","veryfast","-c:a","aac","-b:a","96k")}
+else if(tool==="merge"){if(files.length<2)throw Error("需要至少两个视频");out="merged.mp4";let list="";for(let i=0;i<files.length;i++){let e=files[i].name.split(".").pop().toLowerCase(),n=`f${i}.${e}`;await ff.writeFile(n,await fetchFile(files[i]));list+=`file '${n}'\n`}await ff.writeFile("list.txt",list);a=["-f","concat","-safe","0","-i","list.txt","-c","copy"]}
+else{let fmt=$("format").value.toLowerCase();out="converted."+fmt;if($("quality").value!=="原画")a.push("-vf",`scale=-2:${$("quality").value.replace("p","")}`);if(fmt==="webm")a.push("-c:v","libvpx-vp9","-c:a","libopus");else a.push("-c:v","libx264","-c:a","aac","-movflags","+faststart")}
+a.push(out);await ff.exec(a);let data=await ff.readFile(out),mime=out.endsWith(".gif")?"image/gif":out.endsWith(".mp3")?"audio/mpeg":"video/mp4",url=URL.createObjectURL(new Blob([data.buffer],{type:mime}));$("download").href=url;$("download").download=out;$("rtext").textContent=" 文件大小："+(data.length/1048576).toFixed(1)+" MB";$("result").classList.add("show");prog(100,"处理完成")}
+catch(e){alert("处理失败："+e.message);prog(0,"处理失败")}finally{$("run").disabled=false}};
+</script></body></html>

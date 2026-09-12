@@ -12,12 +12,19 @@ select{width:100%;padding:12px;border-radius:10px;background:#0d1427;color:white
 .features{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}.feature{background:#121a30;border:1px solid #263252;padding:20px;border-radius:16px}
 .price{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}.p{padding:24px;border:1px solid #2c395e;border-radius:18px;background:#121a30}.small{font-size:13px;color:#8996b8}footer{text-align:center;color:#7e8baa;padding:35px 0}
 @media(max-width:700px){.features,.price{grid-template-columns:1fr}}
+
+.auth-overlay{position:fixed;inset:0;background:rgba(3,7,18,.78);display:none;align-items:center;justify-content:center;padding:18px;z-index:50}
+.auth-box{width:min(430px,100%);background:#121a30;border:1px solid #334267;border-radius:22px;padding:26px;box-shadow:0 20px 70px rgba(0,0,0,.4)}
+.auth-box h2{margin:0 0 8px}.auth-box .hint{color:#9eabd0;font-size:14px;margin-bottom:18px}
+.auth-box input{width:100%;padding:13px 14px;margin:7px 0;border-radius:11px;border:1px solid #344263;background:#0d1427;color:#fff;outline:none}
+.auth-box input:focus{border-color:#7886ff}.auth-actions{display:flex;gap:10px;margin-top:12px}.auth-actions button{flex:1}
+.auth-msg{min-height:20px;margin-top:12px;font-size:14px;color:#b8c5e5}.close-auth{float:right;background:transparent;color:#aab4d0;font-size:22px;padding:0}
 </style></head><body><div class="wrap">
 <nav><div class="logo">Convert<span>Pro</span></div><button class="navbtn" id="authBtn">登录 / 注册</button></nav>
 <section class="hero"><h1>视频转换，简单快速</h1><p>手机友好 · 登录框架 · 每日免费额度</p></section>
 <section class="card"><div class="drop"><input id="file" type="file" accept="video/*">
 <button class="primary" id="pick">选择视频</button><p id="filename">尚未选择文件</p>
-<div class="small">免费用户每天 5 次。当前版本先完成真实额度控制，云端 FFmpeg 下一阶段接入。</div></div>
+<div class="small">先用小视频测试。云端 FFmpeg 将在下一阶段接入。</div></div>
 <div class="row"><div><label>输出格式</label><select id="format"><option>MP4</option><option>WebM</option><option>MOV</option><option>MKV</option><option>MP3 音频</option></select></div>
 <div><label>&nbsp;</label><button class="primary" id="convert" style="width:100%">开始转换</button></div></div>
 <div id="status">等待选择视频。</div></section>
@@ -25,51 +32,128 @@ select{width:100%;padding:12px;border-radius:10px;background:#0d1427;color:white
 <section class="card"><h2>会员</h2><div class="price">
 <div class="p"><h3>Free</h3><h2>¥0</h2><p>每天 5 次</p><button class="secondary">当前方案</button></div>
 <div class="p"><h3>Pro</h3><h2>¥29/月</h2><p>更高额度（支付尚未接入）</p><button class="primary" id="proBtn">升级 Pro</button></div></div></section>
-<footer>ConvertPro V3 · Supabase 登录框架</footer></div>
+
+<div class="auth-overlay" id="authOverlay">
+  <div class="auth-box">
+    <button class="close-auth" id="closeAuth" aria-label="关闭">×</button>
+    <h2 id="authTitle">登录 ConvertPro</h2>
+    <div class="hint" id="authHint">使用邮箱和密码登录；没有账号也可以直接注册。</div>
+    <input id="authEmail" type="email" autocomplete="email" placeholder="邮箱地址">
+    <input id="authPassword" type="password" autocomplete="current-password" placeholder="密码（至少 6 位）">
+    <div class="auth-actions">
+      <button class="primary" id="loginSubmit">登录</button>
+      <button class="secondary" id="signupSubmit">注册</button>
+    </div>
+    <div class="auth-msg" id="authMsg"></div>
+  </div>
+</div>
+<footer>ConvertPro · Supabase 用户系统</footer></div>
 <script type="module">
 import {createClient} from "https://esm.sh/@supabase/supabase-js@2";
+
 const SUPABASE_URL="https://ahmsqzjupdlyrudwooej.supabase.co";
 const PUBLISHABLE_KEY="sb_publishable_CVX-kRgYViRXZ59Dpg6rGQ_X0IbPANJ";
-const supabase=(PUBLISHABLE_KEY.startsWith("sb_publishable_")||PUBLISHABLE_KEY.length>30)?createClient(SUPABASE_URL,PUBLISHABLE_KEY):null;
-const $=x=>document.getElementById(x);let selected=null;
+const supabase=createClient(SUPABASE_URL,PUBLISHABLE_KEY);
+const $=x=>document.getElementById(x);
+let selected=null;
+
 $("pick").onclick=()=>$("file").click();
-$("file").onchange=e=>{selected=e.target.files[0];$("filename").textContent=selected?selected.name:"尚未选择文件"};
-$("authBtn").onclick=async()=>{if(!supabase){alert("先在代码中填入 Publishable key。");return}
-const email=prompt("输入邮箱：");if(!email)return;const password=prompt("输入密码（至少6位）：");if(!password)return;
-let r=await supabase.auth.signInWithPassword({email,password});if(r.error){r=await supabase.auth.signUp({email,password});alert(r.error?"错误："+r.error.message:"注册请求已发送，请检查邮箱。")}else{alert("登录成功");$("authBtn").textContent="已登录"}};
-async function refreshQuota(){
-  if(!supabase){$("status").textContent="Supabase 未连接。";return}
+$("file").onchange=e=>{
+  selected=e.target.files[0]||null;
+  $("filename").textContent=selected?selected.name:"尚未选择文件";
+  refreshQuota();
+};
+
+function openAuth(){
+  $("authOverlay").style.display="flex";
+  $("authMsg").textContent="";
+  $("authEmail").focus();
+}
+function closeAuth(){$("authOverlay").style.display="none"}
+
+$("authBtn").onclick=async()=>{
   const {data:{user}}=await supabase.auth.getUser();
-  if(!user){$("status").textContent="请先登录后使用转换功能。";return}
-  const {data:profile,error}=await supabase.from("profiles").select("plan,daily_count,last_used_date").eq("id",user.id).maybeSingle();
+  if(user){
+    if(confirm("当前已登录。是否退出？")) await supabase.auth.signOut();
+  }else openAuth();
+};
+$("closeAuth").onclick=closeAuth;
+$("authOverlay").onclick=e=>{if(e.target===$("authOverlay"))closeAuth()};
+
+$("loginSubmit").onclick=async()=>{
+  const email=$("authEmail").value.trim();
+  const password=$("authPassword").value;
+  if(!email||!password){$("authMsg").textContent="请输入邮箱和密码。";return}
+  $("loginSubmit").disabled=true;$("signupSubmit").disabled=true;
+  $("authMsg").textContent="正在登录……";
+  const {error}=await supabase.auth.signInWithPassword({email,password});
+  $("loginSubmit").disabled=false;$("signupSubmit").disabled=false;
+  if(error){$("authMsg").textContent="登录失败："+error.message;return}
+  $("authMsg").textContent="登录成功！";
+  await updateAuthUI();
+  await refreshQuota();
+  setTimeout(closeAuth,500);
+};
+
+$("signupSubmit").onclick=async()=>{
+  const email=$("authEmail").value.trim();
+  const password=$("authPassword").value;
+  if(!email||!password){$("authMsg").textContent="请输入邮箱和密码。";return}
+  if(password.length<6){$("authMsg").textContent="密码至少需要 6 位。";return}
+  $("loginSubmit").disabled=true;$("signupSubmit").disabled=true;
+  $("authMsg").textContent="正在注册……";
+  const {data,error}=await supabase.auth.signUp({
+    email,password,
+    options:{emailRedirectTo:window.location.origin+window.location.pathname}
+  });
+  $("loginSubmit").disabled=false;$("signupSubmit").disabled=false;
+  if(error){$("authMsg").textContent="注册失败："+error.message;return}
+  if(data.session){
+    $("authMsg").textContent="注册成功，已自动登录。";
+    await updateAuthUI();
+    await refreshQuota();
+    setTimeout(closeAuth,700);
+  }else{
+    $("authMsg").textContent="注册成功！请检查邮箱并点击确认链接，然后返回网站登录。";
+  }
+};
+
+async function updateAuthUI(){
+  const {data:{user}}=await supabase.auth.getUser();
+  $("authBtn").textContent=user?("已登录："+(user.email||"用户")):"登录 / 注册";
+}
+
+async function refreshQuota(){
+  const {data:{user}}=await supabase.auth.getUser();
+  if(!user){
+    $("status").textContent=selected?"已选择："+selected.name+"\n请先登录后使用转换功能。":"等待选择视频。";
+    return;
+  }
+  const {data:profile,error}=await supabase.from("profiles")
+    .select("plan,daily_count,last_used_date")
+    .eq("id",user.id).maybeSingle();
   if(error){$("status").textContent="额度读取失败："+error.message;return}
-  if(!profile){$("status").textContent="用户资料正在初始化，请稍后再试。";return}
+  if(!profile){$("status").textContent="用户资料正在初始化，请稍后刷新页面。";return}
   const today=new Date().toISOString().slice(0,10);
   const used=profile.last_used_date===today?profile.daily_count:0;
-  const limit=profile.plan==="pro"?999999:5;
-  $("status").textContent=`今日额度：${used} / ${profile.plan==="pro"?"不限":limit}\n${selected?"已选择："+selected.name:"等待选择视频。"}`;
+  const limit=profile.plan==="pro"?"不限":"5";
+  $("status").textContent=`今日额度：${used} / ${limit}\n${selected?"已选择："+selected.name:"等待选择视频。"}`;
 }
 
 $("convert").onclick=async()=>{
   if(!selected){alert("请先选择视频");return}
-  if(!supabase){alert("Supabase 未连接");return}
+  const {data:{user}}=await supabase.auth.getUser();
+  if(!user){openAuth();return}
+
   $("convert").disabled=true;
   $("status").textContent="正在检查今日额度……";
-
-  const {data:{user}}=await supabase.auth.getUser();
-  if(!user){
-    $("convert").disabled=false;
-    alert("请先登录 / 注册");
-    return;
-  }
-
   const {data,error}=await supabase.rpc("use_conversion");
+
   if(error){
     $("convert").disabled=false;
     $("status").textContent="额度检查失败："+error.message;
     return;
   }
-
   if(!data?.success){
     $("convert").disabled=false;
     $("status").textContent=data?.message||"今日额度已用完";
@@ -77,13 +161,14 @@ $("convert").onclick=async()=>{
     return;
   }
 
-  $("status").textContent="额度使用成功！\n当前已扣除 1 次。\n云端 FFmpeg 转换将在下一阶段接入。";
+  $("status").textContent="本次使用已记录。\n云端 FFmpeg 视频转换将在下一阶段接入。";
   $("convert").disabled=false;
   await refreshQuota();
 };
 
-supabase?.auth.onAuthStateChange(()=>refreshQuota());
-refreshQuota();
-
 $("proBtn").onclick=()=>alert("Pro 支付还未接入，目前不要付款。");
+
+supabase.auth.onAuthStateChange(()=>{updateAuthUI();refreshQuota()});
+await updateAuthUI();
+await refreshQuota();
 </script></body></html>
